@@ -60,6 +60,8 @@ class PixelInterpreter:
 
     def interpreter(self) -> list[int]:
         while True:
+            if self.debug:
+                print(self.cur_pos, self.physical_colour, self.str_direction)
             block = self.get_block(self.cur_pos)
             border = self.get_border(block)
             next_pos = self.step_from_border(border)
@@ -73,6 +75,17 @@ class PixelInterpreter:
             self.cur_pos = get_next_position_in_block(next_block)
             self.cur_color = next_color
         return self.stack
+
+    @property
+    def physical_colour(self) -> str:
+        y, x = self.cur_pos
+        rgb = tuple(self.img_arr[y, x][:3])
+        return '{:02X}{:02X}{:02X}'.format(rgb[0], rgb[1], rgb[2])
+
+    @property
+    def str_direction(self) -> str:
+        directions = ['right', 'down', 'left', 'up']
+        return directions[self.dir_pointer]
 
     def try_rotate(self) -> bool:
         for i in range(8):
@@ -169,7 +182,7 @@ class PixelInterpreter:
                 self.stack.append(int(input()))
             elif command == 'in_char':
                 self.stack.append(ord(input()[0]))
-            '''if command not in ['out_num', 'out_char', 'in_num', 'in_char']:
-                print(self.stack)'''
+            if self.debug and command not in ['out_num', 'out_char', 'in_num', 'in_char']:
+                print(self.stack)
         except IndexError:
             pass
