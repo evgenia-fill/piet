@@ -56,7 +56,7 @@ class PixelInterpreter:
         if not (0 <= y < self.height and 0 <= x < self.width): return None
         rgb = tuple(self.img_arr[y, x][:3])
         colour_number = '{:02X}{:02X}{:02X}'.format(rgb[0], rgb[1], rgb[2])
-        return self.get_colour_by_number(colour_number)
+        return get_colour_by_number(colour_number)
 
     def interpreter(self) -> list[int]:
         while True:
@@ -68,7 +68,7 @@ class PixelInterpreter:
                 continue
             next_block = self.get_block(next_pos)
             next_color = self.get_colour(next_pos)
-            command = self.get_command(self.cur_color, next_color)
+            command = get_command(self.cur_color, next_color)
             if command: self.execute_command(command)
             self.cur_pos = get_next_position_in_block(next_block)
             self.cur_color = next_color
