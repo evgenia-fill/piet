@@ -3,13 +3,13 @@ from pixel_Interpreter import PixelInterpreter
 
 
 def main():
-    a = input("Введите путь к изображению: ")
-    img_parser = UserInputParser(a)
-    img_arr = img_parser.open_image()
+    image_path = input("Введите путь к изображению: ")
+    parser = UserInputParser(image_path)
+    img_arr = parser.open_image()
     interpreter = PixelInterpreter(img_arr)
-    result_stack = interpreter.interpreter()
-    print("Результат стека:", result_stack)
+    result = interpreter.interpreter()
 
 
 if __name__ == "__main__":
     main()
+# /Users/evgeniavolkova/Desktop/уник/питон/Piet/test image/пиет.hello_world.png

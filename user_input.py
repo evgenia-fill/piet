@@ -11,5 +11,4 @@ class UserInputParser:
     def open_image(self):
         image = Image.open(self.path)
         img_arr = np.array(image)
-        # image.show()
         return img_arr
