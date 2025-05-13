@@ -7,7 +7,7 @@ def get_next_position_in_block(block):
 
 
 class PixelInterpreter:
-    def __init__(self, img_arr):
+    def __init__(self, img_arr, debug=False):
         self.img_arr = img_arr
         self.height, self.width, _ = img_arr.shape
         self.stack = []
@@ -16,6 +16,7 @@ class PixelInterpreter:
         self.cod_chooser = 0
         self.cur_pos = self.find_start()
         self.cur_color = self.get_colour(self.cur_pos)
+        self.debug = debug
 
     def find_start(self):
         for y in range(self.height):
@@ -118,6 +119,8 @@ class PixelInterpreter:
 
     def execute_command(self, command):
         try:
+            if self.debug:
+                print(command)
             if command == 'push':
                 self.stack.append(len(self.get_block(self.cur_pos)))
             elif command == 'pop':
@@ -160,5 +163,9 @@ class PixelInterpreter:
                 print(self.stack.pop(), end='')
             elif command == 'out_char':
                 print(chr(self.stack.pop()), end='')
+            elif command == 'in_num':
+                self.stack.append(int(input()))
+            elif command == 'in_char':
+                self.stack.append(ord(input()[0]))
         except IndexError:
             pass
