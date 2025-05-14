@@ -34,7 +34,7 @@ def get_command(curr_color, next_color) -> str | None:
 
 
 class PixelInterpreter:
-    def __init__(self, img_arr: np.array, debug:bool=False):
+    def __init__(self, img_arr: np.array, debug:bool=False, step_by_step:bool=False):
         self.img_arr = img_arr
         self.height, self.width, _ = img_arr.shape
         self.stack = []
@@ -45,6 +45,7 @@ class PixelInterpreter:
         self.cur_color = self.get_colour(self.cur_pos)
         self.debug = debug
         self.output = ""
+        self.step_by_step = step_by_step
 
     def find_start(self) -> tuple[int, int]:
         for y in range(self.height):
@@ -77,6 +78,8 @@ class PixelInterpreter:
             if command: self.execute_command(command)
             self.cur_pos = get_next_position_in_block(next_block)
             self.cur_color = next_color
+            if self.step_by_step:
+                input()
         return self.output
 
     @property
@@ -194,7 +197,8 @@ class PixelInterpreter:
                 self.stack.append(ord(input()[0]))
             if self.debug:
                 print()
-            if self.debug and command not in ['out_num', 'out_char', 'in_num', 'in_char']:
-                print(self.stack)
+            if self.debug:
+                end = "" if self.step_by_step else "\n"
+                print(self.stack, end=end)
         except IndexError:
             pass
