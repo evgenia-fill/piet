@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 import argparse
 from pixel_Interpreter import PixelInterpreter
 from user_input import UserInputParser
+from errors import *
+from colored_text import red
 
 
 parser = ArgumentParser(description="Интерпретатор языка Piet, написанный на python")
@@ -14,11 +16,18 @@ parser.add_argument('--step-by-step', '-st', action=argparse.BooleanOptionalActi
 parser.add_argument('--size', '-s', type=int, default=1, #// , nargs='?'
                     help="Размер кодела (по умолчанию 1). Укажите положительное целое число.")
 args = parser.parse_args()
-step_by_step = args.debug and args.step_by_step
-if args.size >= 1:
+try:
+    if args.step_by_step and not args.debug:
+        raise IncorrectModeError("Режим пошагового исполнения можно использовать только при отладке!")
+    if args.size < 1:
+        raise IncorrectSizeError("Размер кодела должен быть >= 1!")
     parser = UserInputParser(args.image_path, size=args.size)
     img_arr = parser.open_image()
-    interpreter = PixelInterpreter(img_arr, debug=args.debug, step_by_step=step_by_step)
+    interpreter = PixelInterpreter(img_arr, debug=args.debug, step_by_step=args.step_by_step)
     result = interpreter.interpreter()
-else:
-    print("Размер кодела должен быть >= 1")
+except FileNotFoundError:
+    print(red("Некорректный путь до изображения!"))
+except UnknownColorError:
+        print(red("Использован недопустимый цвет!"))
+except Exception as e:
+    print(red(e))

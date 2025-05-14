@@ -1,5 +1,6 @@
 import numpy as np
 from collections import deque
+from errors import UnknownColorError
 
 
 def get_next_position_in_block(block: set) -> tuple[int, int]:
@@ -59,7 +60,7 @@ class PixelInterpreter:
         rgb = tuple(self.img_arr[y, x][:3])
         colour_number = '{:02X}{:02X}{:02X}'.format(rgb[0], rgb[1], rgb[2])
         colour = get_colour_by_number(colour_number)
-        if colour is None: raise ValueError
+        if colour is None: raise UnknownColorError
         return colour
 
     def interpreter(self) -> str:
