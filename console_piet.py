@@ -3,6 +3,7 @@ import argparse
 from pixel_Interpreter import PixelInterpreter
 from user_input import UserInputParser
 
+# вдруг понадобится такой вариант запуска
 parser = ArgumentParser(description="Интерпретатор языка Piet, написанный на python")
 parser.add_argument("image_path", help="путь до интерпретируемого изображения")
 parser.add_argument('--debug', action=argparse.BooleanOptionalAction)

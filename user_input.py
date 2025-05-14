@@ -9,6 +9,6 @@ class UserInputParser:
         self.path = path
 
     def open_image(self):
-        image = Image.open(self.path)
+        image = Image.open(self.path).convert('RGB')
         img_arr = np.array(image)
         return img_arr
