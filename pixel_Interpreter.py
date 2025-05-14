@@ -44,6 +44,7 @@ class PixelInterpreter:
         self.cur_pos = self.find_start()
         self.cur_color = self.get_colour(self.cur_pos)
         self.debug = debug
+        self.output = ""
 
     def find_start(self) -> tuple[int, int]:
         for y in range(self.height):
@@ -58,7 +59,7 @@ class PixelInterpreter:
         colour_number = '{:02X}{:02X}{:02X}'.format(rgb[0], rgb[1], rgb[2])
         return get_colour_by_number(colour_number)
 
-    def interpreter(self) -> list[int]:
+    def interpreter(self) -> str:
         while True:
             '''if self.debug:
                 print(self.cur_pos, self.physical_colour, self.str_direction)'''
@@ -74,7 +75,7 @@ class PixelInterpreter:
             if command: self.execute_command(command)
             self.cur_pos = get_next_position_in_block(next_block)
             self.cur_color = next_color
-        return self.stack
+        return self.output
 
     @property
     def physical_colour(self) -> str:
@@ -178,9 +179,13 @@ class PixelInterpreter:
             elif command == 'switch':
                 self.cod_chooser = (self.cod_chooser + self.stack.pop()) % 2
             elif command == 'out_num':
-                print(self.stack.pop(), end='')
+                n = self.stack.pop()
+                print(n, end='')
+                self.output += str(n)
             elif command == 'out_char':
-                print(chr(self.stack.pop()), end='')
+                ch = chr(self.stack.pop())
+                print(ch, end='')
+                self.output += ch
             elif command == 'in_num':
                 self.stack.append(int(input()))
             elif command == 'in_char':
