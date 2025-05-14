@@ -7,9 +7,12 @@ def main():
     parser = UserInputParser(image_path)
     img_arr = parser.open_image()
     interpreter = PixelInterpreter(img_arr)
-    result = interpreter.interpreter()
+    try:
+        result = interpreter.interpreter()
+        print(result)
+    except ValueError as e:
+        print("Использован недопустимый цвет!")
 
 
 if __name__ == "__main__":
     main()
-# /Users/evgeniavolkova/Desktop/уник/питон/Piet/test image/пиет.hello_world.png

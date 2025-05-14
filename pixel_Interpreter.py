@@ -57,7 +57,9 @@ class PixelInterpreter:
         if not (0 <= y < self.height and 0 <= x < self.width): return None
         rgb = tuple(self.img_arr[y, x][:3])
         colour_number = '{:02X}{:02X}{:02X}'.format(rgb[0], rgb[1], rgb[2])
-        return get_colour_by_number(colour_number)
+        colour = get_colour_by_number(colour_number)
+        if colour is None: raise ValueError
+        return colour
 
     def interpreter(self) -> str:
         while True:
