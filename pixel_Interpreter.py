@@ -135,9 +135,12 @@ class PixelInterpreter:
     def execute_command(self, command: str):
         try:
             if self.debug:
-                print(command)
+                print(command, end=" ")
             if command == 'push':
-                self.stack.append(len(self.get_block(self.cur_pos)))
+                value = len(self.get_block(self.cur_pos))
+                if self.debug:
+                    print(value, end="")
+                self.stack.append(value)
             elif command == 'pop':
                 self.stack.pop()
             elif command == 'add':
@@ -182,6 +185,8 @@ class PixelInterpreter:
                 self.stack.append(int(input()))
             elif command == 'in_char':
                 self.stack.append(ord(input()[0]))
+            if self.debug:
+                print()
             if self.debug and command not in ['out_num', 'out_char', 'in_num', 'in_char']:
                 print(self.stack)
         except IndexError:
