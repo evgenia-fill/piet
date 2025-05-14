@@ -1,6 +1,7 @@
 import numpy as np
 from collections import deque
 from errors import UnknownColorError
+from colored_text import colored_text
 
 
 def get_next_position_in_block(block: set) -> tuple[int, int]:
@@ -65,8 +66,8 @@ class PixelInterpreter:
 
     def interpreter(self) -> str:
         while True:
-            '''if self.debug:
-                print(self.cur_pos, self.physical_colour, self.str_direction)'''
+            if self.debug:
+                print(self.cur_pos, colored_text(self.physical_colour, self.physical_colour), self.str_direction)
             block = self.get_block(self.cur_pos)
             border = self.get_border(block)
             next_pos = self.step_from_border(border)
@@ -91,7 +92,7 @@ class PixelInterpreter:
 
     @property
     def str_direction(self) -> str:
-        directions = ['right', 'down', 'left', 'up']
+        directions = ['→', '↓', '←', '↑']
         return directions[self.dir_pointer]
 
     def try_rotate(self) -> bool:
