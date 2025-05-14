@@ -1,6 +1,4 @@
-import sys
-from io import BytesIO
-from PIL import Image, ImageOps
+from PIL import Image
 import numpy as np
 
 
