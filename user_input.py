@@ -3,10 +3,20 @@ import numpy as np
 
 
 class UserInputParser:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, filename: str, size: int = 1):
+        self.path = filename
+        self.size = size
 
-    def open_image(self):
+    def open_image(self) -> np.array:
         image = Image.open(self.path).convert('RGB')
-        img_arr = np.array(image)
+        '''img_arr = np.array(image)
+        return img_arr'''
+        width, height = image.size
+        new_width, new_height = width // self.size, height // self.size
+        img_arr = np.zeros((new_height, new_width, 3), dtype=np.uint8)
+        for y in range(0, height, self.size):
+            for x in range(0, width, self.size):
+                r, g, b = image.getpixel((x, y))
+                img_arr[y // self.size, x // self.size] = r, g, b
         return img_arr
+
