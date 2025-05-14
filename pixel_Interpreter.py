@@ -60,8 +60,8 @@ class PixelInterpreter:
 
     def interpreter(self) -> list[int]:
         while True:
-            if self.debug:
-                print(self.cur_pos, self.physical_colour, self.str_direction)
+            '''if self.debug:
+                print(self.cur_pos, self.physical_colour, self.str_direction)'''
             block = self.get_block(self.cur_pos)
             border = self.get_border(block)
             next_pos = self.step_from_border(border)
@@ -166,8 +166,8 @@ class PixelInterpreter:
             elif command == 'duplicate':
                 self.stack.append(self.stack[-1])
             elif command == 'roll':
-                depth = self.stack.pop()
                 rolls = self.stack.pop()
+                depth = self.stack.pop()
                 if depth <= 0 or depth > len(self.stack):
                     return
                 sl = self.stack[-depth:]
