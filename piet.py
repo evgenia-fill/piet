@@ -4,7 +4,6 @@ from errors import *
 from colored_text import red
 
 
-# image_path = input("Введите путь к изображению: ")
 def main(image_path):
     try:
         parser = UserInputParser(image_path)
@@ -20,5 +19,7 @@ def main(image_path):
         print(red(e))
 
 
+# image_path = input("Введите путь к изображению: ")
 if __name__ == "__main__":
-    main('/Users/evgeniavolkova/Desktop/уник/питон/piet/test_image/Piet_hello_breakpoints.png')
+    main('/Users/evgeniavolkova/Desktop/уник/питон/piet/test_image/piet.fibonachi.png')
+    # main(image_path)
