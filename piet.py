@@ -4,14 +4,14 @@ from errors import *
 from colored_text import red
 
 
-def main():
-    image_path = input("Введите путь к изображению: ")
+# image_path = input("Введите путь к изображению: ")
+def main(image_path):
     try:
         parser = UserInputParser(image_path)
         img_arr, breakpoints = parser.open_image()
         interpreter = PixelInterpreter(img_arr)
         result = interpreter.interpreter()
-        print(result)
+        return result
     except UnknownColorError as e:
         print(red("Использован недопустимый цвет!"))
     except FileNotFoundError as e:
@@ -21,4 +21,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main('/Users/evgeniavolkova/Desktop/уник/питон/piet/test_image/Piet_hello_breakpoints.png')
