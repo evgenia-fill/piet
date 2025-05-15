@@ -22,7 +22,7 @@ try:
     if args.size < 1:
         raise IncorrectSizeError("Размер кодела должен быть >= 1!")
     parser = UserInputParser(args.image_path, size=args.size)
-    img_arr = parser.open_image()
+    img_arr, breakpoints = parser.open_image()
     interpreter = PixelInterpreter(img_arr, debug=args.debug, step_by_step=args.step_by_step)
     result = interpreter.interpreter()
 except FileNotFoundError:

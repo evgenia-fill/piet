@@ -8,7 +8,7 @@ def main():
     image_path = input("Введите путь к изображению: ")
     try:
         parser = UserInputParser(image_path)
-        img_arr = parser.open_image()
+        img_arr, breakpoints = parser.open_image()
         interpreter = PixelInterpreter(img_arr)
         result = interpreter.interpreter()
         print(result)
