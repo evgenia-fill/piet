@@ -23,7 +23,12 @@ try:
         raise IncorrectSizeError("Размер кодела должен быть >= 1!")
     parser = UserInputParser(args.image_path, size=args.size)
     img_arr, breakpoints = parser.open_image()
-    interpreter = PixelInterpreter(img_arr, debug=args.debug, step_by_step=args.step_by_step, breakpoints=breakpoints)
+    br_mode = 'some' if len(breakpoints) > 0 else 'all'
+    interpreter = PixelInterpreter(img_arr, 
+                                   debug=args.debug, 
+                                   step_by_step=args.step_by_step, 
+                                   breakpoints=breakpoints, 
+                                   breakpoint_mode=br_mode)
     result = interpreter.interpreter()
 except FileNotFoundError:
     print(red("Некорректный путь до изображения!"))

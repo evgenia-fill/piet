@@ -40,7 +40,8 @@ class PixelInterpreter:
     def __init__(self, img_arr: np.array, 
                  debug:bool=False, 
                  step_by_step:bool=False, 
-                 breakpoints: Iterable[tuple[int, int]] = [],):
+                 breakpoints: Iterable[tuple[int, int]] = [],
+                 breakpoint_mode: str = 'some'):
         self.img_arr = img_arr
         self.height, self.width, _ = img_arr.shape
         self.stack = []
@@ -56,6 +57,10 @@ class PixelInterpreter:
         self.output = ""
         self.step_by_step = step_by_step
         self.breakpoints = set(breakpoints)
+        if breakpoint_mode == 'all':
+            for y in range(self.height):
+                for x in range(self.width):
+                    self.breakpoints.add((y, x))
         self.breakpoint_found = False
         self.next_color = None
         self.physical_next_color = '000000'
@@ -99,7 +104,7 @@ class PixelInterpreter:
             self.cur_color = self.next_color
             self.physical_cur_color = self.physical_next_color
             
-            if self.step_by_step:
+            if self.step_by_step and self.breakpoint_found:
                 input()
         return self.output
 
