@@ -2,6 +2,7 @@ import numpy as np
 from collections import deque
 from errors import UnknownColorError
 from colored_text import colored_text
+from typing import Iterable
 
 
 def get_next_position_in_block(block: set) -> tuple[int, int]:
@@ -36,64 +37,97 @@ def get_command(curr_color, next_color) -> str | None:
 
 
 class PixelInterpreter:
-    def __init__(self, img_arr: np.array, debug:bool=False, step_by_step:bool=False):
+    def __init__(self, img_arr: np.array, 
+                 debug:bool=False, 
+                 step_by_step:bool=False, 
+                 breakpoints: Iterable[tuple[int, int]] = [],):
         self.img_arr = img_arr
         self.height, self.width, _ = img_arr.shape
         self.stack = []
         self.visited = np.zeros((self.height, self.width), dtype=bool)
         self.dir_pointer = 0
         self.cod_chooser = 0
+        self.block = set()
         self.cur_pos = self.find_start()
         self.cur_color = self.get_colour(self.cur_pos)
+        self.physical_cur_color = self.get_physical_colour(self.cur_pos)
+        
         self.debug = debug
         self.output = ""
         self.step_by_step = step_by_step
+        self.breakpoints = set(breakpoints)
+        self.breakpoint_found = False
+        self.next_color = None
+        self.physical_next_color = '000000'
 
     def find_start(self) -> tuple[int, int]:
         for y in range(self.height):
             for x in range(self.width):
                 if self.get_colour((y, x)) not in ('black', 'white', None): return y, x
         return 0, 0
+    
+    def to_hex_colour(self, rgb: tuple[int, int, int]):
+        return '{:02X}{:02X}{:02X}'.format(rgb[0], rgb[1], rgb[2])
 
     def get_colour(self, pos: tuple[int, int]) -> tuple[int, int] | None:
         y, x = pos
         if not (0 <= y < self.height and 0 <= x < self.width): return None
         rgb = tuple(self.img_arr[y, x][:3])
-        colour_number = '{:02X}{:02X}{:02X}'.format(rgb[0], rgb[1], rgb[2])
+        colour_number = self.to_hex_colour(rgb)
         colour = get_colour_by_number(colour_number)
         if colour is None: raise UnknownColorError
         return colour
 
     def interpreter(self) -> str:
-        while True:
-            if self.debug:
-                print(self.cur_pos, colored_text(self.physical_colour, self.physical_colour), self.str_direction)
-            block = self.get_block(self.cur_pos)
-            border = self.get_border(block)
+        while True:            
+            self.block = self.get_block(self.cur_pos)
+            border = self.get_border(self.block)
             next_pos = self.step_from_border(border)
             if not next_pos or self.get_colour(next_pos) == 'black':
                 if not self.try_rotate(): break
                 continue
+            
             next_block = self.get_block(next_pos)
-            next_color = self.get_colour(next_pos)
-            command = get_command(self.cur_color, next_color)
+            self.next_color = self.get_colour(next_pos)
+            self.physical_next_color = self.get_physical_colour(next_pos)
+            if self.debug and self.breakpoint_found:
+                self.print_debug_info()
+            command = get_command(self.cur_color, self.next_color)
             if command: self.execute_command(command)
+            
             self.cur_pos = get_next_position_in_block(next_block)
-            self.cur_color = next_color
+            self.cur_color = self.next_color
+            self.physical_cur_color = self.physical_next_color
+            
             if self.step_by_step:
                 input()
         return self.output
 
-    @property
-    def physical_colour(self) -> str:
-        y, x = self.cur_pos
-        rgb = tuple(self.img_arr[y, x][:3])
-        return '{:02X}{:02X}{:02X}'.format(rgb[0], rgb[1], rgb[2])
+    def get_physical_colour(self, pos: tuple[int, int]) -> str:
+        rgb = tuple(self.img_arr[*pos][:3])
+        return self.to_hex_colour(rgb)
 
     @property
     def str_direction(self) -> str:
         directions = ['→', '↓', '←', '↑']
         return directions[self.dir_pointer]
+    
+    @property
+    def str_cod_chooser(self) -> str:
+        if self.dir_pointer == 0 and self.cod_chooser == 0 or self.dir_pointer == 1 and self.cod_chooser == 1:
+            return '↘'
+        elif self.dir_pointer == 1 and self.cod_chooser == 0 or self.dir_pointer == 2 and self.cod_chooser == 1:
+            return '↙'
+        elif self.dir_pointer == 2 and self.cod_chooser == 0 or self.dir_pointer == 3 and self.cod_chooser == 1:
+            return '↖'
+        elif self.dir_pointer == 3 and self.cod_chooser == 0 or self.dir_pointer == 0 and self.cod_chooser == 1:
+            return '↗'
+    
+    def print_debug_info(self):
+        res = f'{self.cur_pos} {colored_text(self.physical_cur_color, self.physical_cur_color)}->' + \
+              f'{colored_text(self.physical_next_color, self.physical_next_color)} ' + \
+              f'{self.str_direction}{self.str_cod_chooser}'
+        print(res)
 
     def try_rotate(self) -> bool:
         for i in range(8):
@@ -101,8 +135,8 @@ class PixelInterpreter:
                 self.cod_chooser = (self.cod_chooser + 1) % 2
             else:
                 self.dir_pointer = (self.dir_pointer + 1) % 4
-            block = self.get_block(self.cur_pos)
-            border = self.get_border(block)
+            # block = self.get_block(self.cur_pos)
+            border = self.get_border(self.block)
             next_pos = self.step_from_border(border)
             if next_pos and self.get_colour(next_pos) not in ('black', None): return True
         return False
@@ -119,9 +153,12 @@ class PixelInterpreter:
         colour = self.get_colour(start_pos)
         visited = set()
         queue = deque([start_pos])
+        self.breakpoint_found = False
         while len(queue) > 0:
             y, x = queue.popleft()
             if (y, x) in visited: continue
+            if not self.breakpoint_found and (y, x) in self.breakpoints:
+                self.breakpoint_found = True
             visited.add((y, x))
             for dy, dx in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 ny, nx = y + dy, x + dx
@@ -142,12 +179,12 @@ class PixelInterpreter:
 
     def execute_command(self, command: str):
         try:
-            if self.debug:
+            if self.debug and self.breakpoint_found and command != 'push':
                 print(command, end=" ")
             if command == 'push':
-                value = len(self.get_block(self.cur_pos))
-                if self.debug:
-                    print(value, end="")
+                value = len(self.block)
+                if self.debug and self.breakpoint_found:
+                    print(f'push {value}', end="")
                 self.stack.append(value)
             elif command == 'pop':
                 self.stack.pop()
@@ -197,9 +234,9 @@ class PixelInterpreter:
                 self.stack.append(int(input()))
             elif command == 'in_char':
                 self.stack.append(ord(input()[0]))
-            if self.debug:
+            if self.debug and self.breakpoint_found:
                 print()
-            if self.debug:
+            if self.debug and self.breakpoint_found:
                 end = "" if self.step_by_step else "\n"
                 print(self.stack, end=end)
         except IndexError:

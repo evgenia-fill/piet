@@ -32,6 +32,32 @@ class TestPiet(unittest.TestCase):
     def test_power(self, mock_input):
         path = os.path.join(self.test_dir_path, 'power.png')
         self.assertEqual(p.main(path), '1024')
+    
+    def test_fibonachi(self):
+        correct = '1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, ...\n'
+        path = os.path.join(self.test_dir_path, 'piet.fibonachi.png')
+        self.assertEqual(p.main(path), correct)
+    
+    def test_factorial(self):
+        correct = '0! = 1\n' + \
+                  '1! = 1\n' + \
+                  '2! = 2\n' + \
+                  '3! = 6\n' + \
+                  '4! = 24\n' + \
+                  '5! = 120\n' + \
+                  '6! = 720\n' + \
+                  '7! = 5040\n' + \
+                  '8! = 40320\n' + \
+                  '9! = 362880\n' + \
+                  '10! = 3628800\n' + \
+                  '11! = 39916800\n' + \
+                  '12! = 479001600\n' + \
+                  '13! = 6227020800\n' + \
+                  '14! = 87178291200\n' + \
+                  '15! = 1307674368000\n' + \
+                  '16! = 20922789888000\n'
+        path = os.path.join(self.test_dir_path, 'piet.factorial.png')
+        self.assertEqual(p.main(path), correct)
 
 
 if __name__ == '__main__':
